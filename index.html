@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<a href="javascript:void(0)" id="openApp">打开客户端</a>
+<!-- <script type="text/javascript" src="./o.js"></script> -->
+<script type="text/javascript">
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    var isWechat = (/MicroMessenger/i).test(userAgent);
+    var isIos = (/(iPhone|iPod|iPad);?/i).test(userAgent);
+    var isAndroid = (/android/i).test(userAgent);
+    var isSafari = isIos && (/Safari/i).test(userAgent);
+    var appScheme = 'lessomall://weixin.lessomall.com';
+    var downIos = 'https://itunes.apple.com/cn/app/id1179899734?mt=8';
+    var downAndroid = 'http://119.147.33.14/imtt.dd.qq.com/16891/A320A346D70794302C3DDED962E61172.apk?mkey=591bd4199e1e01ce&f=8a5d&c=0&fsname=com.lessomall.cloudbiz_V1.4.1_141.apk&csr=1bbd&p=.apk';
+
+    document.getElementById('openApp').onclick = function() {
+        if(isWechat) {
+          document.getElementById('guide').style.display = 'block';
+          return;
+        }
+
+        var ifr;
+        if(!isSafari) {
+            ifr = document.createElement('iframe');
+            ifr.style.display = 'none';
+            ifr.src = appScheme;
+            document.body.appendChild(ifr);
+        }else {
+            window.location.href = appScheme;
+        }
+
+        function checkOpen(cb){
+            var clickTime = +new Date(),
+                count = 0,
+                intHandle = 0;
+
+            //启动间隔20ms运行的定时器，并检测累计消耗时间是否超过3000ms，超过则结束
+            intHandle = setInterval(function(){
+                count++;
+                var elsTime = +new Date() - clickTime;
+                if (count >= 100 || elsTime > 3000 ) {
+                    clearInterval(intHandle);
+                    //计算结束，根据不同，做不同的跳转处理，1表示已经跳转APP成功了
+                    if ( elsTime > 3000 || document.hidden || document.webkitHidden) {
+                        cb(1);
+                    } else {
+                        cb(0);
+                    }
+                }
+            }, 20);
+        }
+
+        checkOpen(function(opened) {
+            if(!opened) {
+                if(isIos) {
+                  window.location.href = downIos;
+                }else if(isAndroid) {
+                  window.location.href = downAndroid;
+                }
+            }
+        });
+
+        setTimeout(function() {
+            document.body.removeChild(ifr);
+        }, 2000);
+
+        // var loadTime = +new Date();
+        // downTimer = setTimeout(function() {
+        //   var timeoutTime = +new Date();
+        //   alert(timeoutTime - loadTime)
+        //   alert(document.webkitHidden)
+        //   if(!document.webkitHidden && timeoutTime - loadTime < 503) {
+        //     if(isIos) {
+        //       window.location.href = downIos;
+        //     }else if(isAndroid) {
+        //       window.location.href = downAndroid;
+        //     }
+        //   }
+        //   document.body.removeChild(ifr);
+        // }, 25);
+
+        // window.beforeunload = function() {
+        //     clearTimeout(downTimer);
+        // }
+        // window.pagehide = function() {
+        //     clearTimeout(downTimer);
+        // }
+        // window.onblur = function() {
+        //     clearTimeout(downTimer);
+        // }
+    }
+</script>
+</body>
+</html>
